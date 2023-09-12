@@ -1,0 +1,48 @@
+name: Build & Release NodeJs Docker Image
+
+on: workflow_call
+
+jobs:
+  release:
+    name: Build & Release package with ${{ matrix.node-version }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    strategy:
+      matrix:
+        node-version: ["18.17.0"]
+        npm-version: ["9.6.7"]
+        pnpm-version: ["8.6.10"]
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup environment
+        uses: apart-re/gh-action-templates/.github/actions/setup-environment@main
+        with:
+          node-version: ${{ matrix.node-version }}
+          npm-version: ${{ matrix.npm-version }}
+          pnpm-version: ${{ matrix.pnpm-version }}
+          os: ${{ matrix.os }}
+
+      - name: Install dependencies
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "Running pnpm install --frozen-lockfile"
+          pnpm install --frozen-lockfile
+
+      - name: Release package
+        id: release
+        if: ${{ success() }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: npx semantic-release
