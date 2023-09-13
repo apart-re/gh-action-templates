@@ -11,7 +11,7 @@ jobs:
         working-directory: ${{ github.workspace }}
     strategy:
       matrix:
-        node-version: ["18.17.0"]
+        node-version: ["18.17.1"]
         npm-version: ["9.6.7"]
         pnpm-version: ["8.6.10"]
         os: [ubuntu-latest]
