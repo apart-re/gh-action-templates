@@ -42,9 +42,6 @@ jobs:
 
       - run: pnpm run lint:check
 
-      # - run: pnpm run spell:check
-      # TODO: enable tests
-      # - run: pnpm run test:coverage
       - uses: apart-re/gh-action-templates/.github/actions/notify-status@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
